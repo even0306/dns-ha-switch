@@ -23,13 +23,13 @@ func Controller() {
 
 	dnsOPS := modules.NewDNSOPS(alidns)
 	ipPorts := config.C.GetStringSlice("value")
-	ipDisabled := false
+	needChangeIP := false
 	for {
 		nowDNSIP := dnsOPS.DescribeIP()
 		for _, ipPort := range ipPorts {
 			ip := strings.Split(ipPort, ":")
 
-			if ipDisabled {
+			if needChangeIP {
 				ok := modules.CheckPort(ipPort)
 				if !ok {
 					slog.Warn("存在服务失联！", "ip_port", ipPort)
@@ -38,7 +38,8 @@ func Controller() {
 
 				dnsOPS.DescribeIP()
 				dnsOPS.ChangeIP(&ip[0])
-				ipDisabled = false
+				slog.Info("已切换DNS解析IP", "IP", ip[0])
+				needChangeIP = false
 			}
 
 			if ip[0] != nowDNSIP {
@@ -54,7 +55,7 @@ func Controller() {
 
 					// 判断连续5次以上无法连接当前dns所设置的ip端口，则退出循环，切换dns的IP
 					if i >= 5 {
-						ipDisabled = true
+						needChangeIP = true
 						break
 					}
 
@@ -62,6 +63,7 @@ func Controller() {
 					if !ok {
 						slog.Warn("存在服务失联！", "ip_port", ipPort)
 						i++
+						time.Sleep(15 * time.Second)
 						continue
 					}
 
