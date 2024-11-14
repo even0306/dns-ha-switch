@@ -32,6 +32,7 @@ func Controller() {
 			if ipDisabled {
 				ok := modules.CheckPort(ipPort)
 				if !ok {
+					slog.Warn("存在服务失联！", "ip_port", ipPort)
 					continue
 				}
 
@@ -59,6 +60,7 @@ func Controller() {
 
 					// 如果出现无法连接当前dns所设置的ip端口，则计数器+1
 					if !ok {
+						slog.Warn("存在服务失联！", "ip_port", ipPort)
 						i++
 						continue
 					}
