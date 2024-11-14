@@ -10,7 +10,7 @@ func GetVersion() string {
 	var z string
 	x = "1"
 	y = "0"
-	z = "1"
+	z = "2"
 
 	slog.Info("dns-api-ops", "version", x+"."+y+"."+z)
 	return x + "." + y + "." + z
